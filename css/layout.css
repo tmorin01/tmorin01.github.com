@@ -331,7 +331,7 @@ ul#nav li.current a { color: #F06000; }
   	-webkit-animation: c_cpp 2s ease;
 }
 .fsl {
-  	width: 85%;
+  	width: 70%;
   	-moz-animation: fsl 2s ease;
   	-webkit-animation: fsl 2s ease;
 }
@@ -351,12 +351,12 @@ ul#nav li.current a { color: #F06000; }
   	-webkit-animation: matlab 2s ease;
 }
 .pmod {
-  	width: 60%;
+  	width: 85%;
   	-moz-animation: pmod 2s ease;
   	-webkit-animation: pmod 2s ease;
 }
 .mango {
-    width: 65%;
+    width: 75%;
     -moz-animation:; mango 2s ease;
     -webkit-animation: mango 2s ease;
 }
