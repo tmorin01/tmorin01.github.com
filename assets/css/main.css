@@ -2564,6 +2564,7 @@ input, select, textarea {
 		.icon > .label {
 			display: none;
 		}
+
 /* Image Fade */
 	.middle {
   		transition: .5s ease;
