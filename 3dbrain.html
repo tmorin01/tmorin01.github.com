@@ -54,15 +54,16 @@
 						<!-- Post -->
 							<section class="post">
 								<header class="major">
-									<span class="date">September 10, 2018</span>
+									<span class="date">December 5, 2018</span>
 									<h1>I 3D-printed my brain!</h1>
 									<p>A few months ago Matt, another grad student in the lab, suggested that
 										we try to 3D-print our brains. Well, we finally did it! Here's how...</p>
 								</header>
 								<div class="image main"><img src="images/me_and_my_brain.jpg" alt="me holding a 3d printed copy of my brain" /></div>
 								<p>When I 3D-printed my brain, I loosely followed this <a href="https://www.instructables.com/id/3D-print-your-own-brain/">guide found on Instructables</a>. 
-									I've included my own detailed instructions below. They assume some <a href="https://ryanstutorials.net/linuxtutorial/">basic knowledge of Linux commands</a>. Moreover, this
-									process requires some sort of access to a 3D-printer and some patience while working with unfriendly software.</p>
+									I've included my own detailed instructions below. They assume some <a href="https://ryanstutorials.net/linuxtutorial/">basic level of comfort with Linux commands and navigating a computer through a Terminal</a>. Moreover, this
+									process requires some sort of access to a 3D-printer and some patience while working with unfriendly software. Also, this method gives you a print of the cortical surface, but leaves out the cerebellum and brainstem. Maybe someday, 
+									I'll look into printing the entire structure... If you have any questions or want to show off your own finished product, send me an email!</p>
 								<h3>Step 0: Setup Your Computer</h3>
 								<p>In order to reformat your MRI scan so that it's suitable for printing, you'll need to set up your computer to run Freesurfer and Meshlab.</p>
 								<ul>
@@ -92,7 +93,7 @@
 										<pre><code>~$ cd /location/of/DICOMs
 ~$ ls
    folder_of_dicoms
-   anotherfile.docx
+   anotherfile.txt
    file.txt
 ~$ dcmunpack -src . -targ my_brain_unpacked -run 1 anat nii anat.nii</pre></code>
 
@@ -103,16 +104,36 @@
 									<p>You'll want to use <a href="http://freesurfer.net/">Freesurfer</a> to convert your 3D image into surface files. You'll run the <code>recon_all</code>
 										command to do this. (<code>recon_all</code> can take a day or more to run, depending on the type of computer you are using.)</p>
 									<li><b>Run recon-all</b></li>
-									<p>Paragraph about running recon-all</p>
+									<p>The documentation for Freesurfer's <code>recon-all</code> command can be found <a href="https://surfer.nmr.mgh.harvard.edu/fswiki/recon-all"> here.</a> 
+										This command can be tricky to run if you're not familiar with Freesurfer, so don't hesitate to consult your local Freesurfer guru (or Google) with questions.
+										First, you'll want to set up your scan with the standard Freesurfer directory structure. It should look something like this:</p>
+										<pre><code>+ subject_name
+|   +-- mri
+|   |   +-- orig
+|   |   |   +-- 001.nii</pre></code>
+										<p> The file, <code>001.nii</code> is your brain scan that you unpacked earlier. Before we run <code>recon-all</code> we just need to convert the file to
+											<code>.mgz</code> format with the following command: <code>mri_convert 001.nii 001.mgz</code>. Also, you'll want to update the enviromental variable 
+											<code>SUBJECTS_DIR</code> and set it to the location of your subject_name folder in the directory structure I outlined above. (e.g. <code>export SUBJECTS_DIR=/path/to/subjects_directory</code>)
+										Now you're ready to run the <code>recon-all</code> command! I recommend that you run this on a compute cluster if you can, to speed things up. Even on a cluster, you might be looking at upwards of a 10-hour runtime, 
+										depending on your settings. The command I run is this: <code>recon-all -all -subjid subject_name</code>.
+										When the command has finished, you should see a folder <code>subject_name/surf</code>. There will be a ton of files in this folder. The two you are interested in are <code>lh.pial</code> and <code>rh.pial</code>. You can
+										open them in Freeview (Freesurfer's viewing tool) to see a rough idea of what your 3D-printed brain will look like. In the next steps, you'll do some file-conversion and cleanup to prepare the images for printing!
+										</p>
 									</ul>
 								<h3>Step 3: Reformat for 3D-Printing</h3>
 									<ul>
 									<li><b>Convert to .stl Format</b></li>
-									<p>Using a command called mri_convert, you can convert the surface files to ".stl" format. This is the file format used by most 3D-printers.
-										Then, using a program called <a href="http://www.meshlab.net/">Meshlab</a> (freely downloadable online) you will need to "smooth" the 
-										surface in order to get a nice print.</p>
+									<p>Using  <code>mri_convert</code> again, you can convert the surface files to ".stl" format. This is the file format used by most 3D-printers.
+										Then, using a program called <a href="http://www.meshlab.net/">Meshlab</a> (freely downloadable online) you will need to combine the 
+										two hemispheres into a single file and "smooth" the surface in order to get a nice print.</p>
 									<li><b>Load Into Meshlab</b></li>
-									<p>paragraph about what to do in meshlab</p>
+									<p>You'll use Meshlab to combine the two hemispheres into a signle file, and smooth out the edges a bit. To import the files into Meshlab,
+										click "File -> Import Mesh" and select the <code>.stl</code> files for each hemisphere. Now, because the shape of the surface files
+										is very complex, we do a little bit of smoothing to simplify the file and make it easier to print. To do so, click "Filters -> Remeshing, 
+										Simplification, and Reconstruction -> Simplification: Quadratic Edge Collapse Decimation. In the screen that pops up, enter 150,000 into
+										 the "number of faces" field and click OK. Finally the <a href="https://www.instructables.com/id/3D-print-your-own-brain/">Instructables Tutorial</a> suggests adding a second round of smoothing 
+										 with "Filters -> Smoothing, Fairing, and Deformation -> Laplacian Smooth." Personally, I thought this erased too many of the imperfections
+										 so I opted out of this step, but it shouldn't make too much of a difference.</p>
 									</ul>
 								<h3>Step 4: Send it to the 3D-Printer!</h3>
 								<p>At my university, I was able to send the .stl file over to the engineering department, where they have a 3D printer available for students.
