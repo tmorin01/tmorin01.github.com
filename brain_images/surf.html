@@ -1,0 +1,139 @@
+
+<div id="brainbrowser" style="width: 800px;height: 800px;"></div>
+
+    
+
+<script type="text/javascript">
+  (function() {
+    "use strict";
+
+    function loadScript(url, callback) {
+      var script = document.createElement("script");
+      script.src = url;
+      if (typeof callback === "function") {
+        script.onload = callback;
+      }
+      document.head.appendChild(script);
+    }
+
+    var scripts = [];
+
+    if (window.THREE === undefined && versionCompare("2.2.0", "2.5.2") < 0) {
+      scripts.push("https://brainbrowser.cbrain.mcgill.ca/js/lib/three.r66.min.js");
+    }
+
+    if (window.BrainBrowser === undefined) {
+      scripts.push("https://brainbrowser.cbrain.mcgill.ca/js/brainbrowser/brainbrowser.surface-viewer.min.js");
+    }
+
+    var index = 1;
+
+    if (scripts.length > 0) {
+      loadScript(scripts[0], function loadNext() {
+        if (index < scripts.length) {
+          loadScript(scripts[index++], loadNext);
+        } else {
+          start();
+        }
+      });
+    } else {
+      start();
+    }
+
+    function start() {
+
+      if (BrainBrowser.config !== undefined) {
+        // v >= 2.0.0
+        BrainBrowser.config.set("worker_dir", "https://brainbrowser.cbrain.mcgill.ca/js/brainbrowser/workers/");
+      } else {
+        // v < 2.0.9
+        BrainBrowser.config = {
+
+          surface_viewer: {
+
+            worker_dir: "https://brainbrowser.cbrain.mcgill.ca/js/brainbrowser/workers/",
+
+            model_types: {
+              mniobj: {
+                worker: "mniobj.worker.js"
+              },
+              wavefrontobj: {
+                worker: "wavefrontobj.worker.js"
+              },
+              freesurferasc: {
+                worker: "freesurferasc.worker.js"
+              }
+            },
+
+            intensity_data_types: {
+              mniobj: {
+                worker: "mniobj.intensity.worker.js"
+              },
+              freesurferasc: {
+                worker: "freesurferasc.intensity.worker.js"
+              }
+            }
+          }
+        };
+
+        // For backwards compatibility v1.5.1
+        BrainBrowser.config.surface_viewer.filetypes = BrainBrowser.config.surface_viewer.model_types;
+      }
+
+      BrainBrowser.SurfaceViewer.start("brainbrowser", function(viewer) {
+        
+
+        var complete_callback;
+
+        
+
+        viewer.render();
+
+        viewer.loadModelFromFile("lh.inflated", {
+  			format: "freesurferasc"
+		});
+
+        
+
+        
+
+        
+
+        
+      });
+    }
+
+    function versionCompare(v1,  v2) {
+      if (!v1) return 1;
+      if (!v2) return -1;
+
+      var version1 = parseVersionString(v1);
+      var version2 = parseVersionString(v2);
+
+      if (version1[0] < version2[0]) {
+        return 1;
+      } else if (version1[0] > version2[0]) {
+        return -1;
+      } else if (version1[1] < version2[1]) {
+        return 1;
+      } else if (version1[1] > version2[1]) {
+        return -1;
+      } else if (version1[2] < version2[2]) {
+        return 1;
+      } else if (version1[2] > version2[2]) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+
+    function parseVersionString (v) {
+      var parts = v.split(".");
+      parts[0] = parseInt(parts[0], 10) || 0;
+      parts[1] = parseInt(parts[1], 10) || 0;
+      parts[2] = parseInt(parts[2], 10) || 0;
+      return parts;
+    }
+  })();
+</script>
+
